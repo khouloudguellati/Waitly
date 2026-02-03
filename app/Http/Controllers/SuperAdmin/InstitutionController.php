@@ -85,16 +85,14 @@ class InstitutionController extends Controller
 
     public function destroy(Institution $institution)
     {
-        $activeTickets = $institution->tickets()
-            ->where('status', 'waiting')
-            ->count();
-
-        if ($activeTickets > 0) {
+        if ($institution->tickets()->where('status', 'waiting')->exists()) {
             return back()->with(
                 'error',
                 'Impossible de supprimer cette institution. Il y a des tickets en attente.'
             );
         }
+
+        $institution->tickets()->delete();
 
         $institution->delete();
 
